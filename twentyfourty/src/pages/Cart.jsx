@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import CartItem from "../components/CartItem";
 import { ToastContainer, toast } from "react-toastify";
 import StripeCheckOut from "react-stripe-checkout";
+import axios from "axios";
 
 const Cart = () => {
   const productData = useSelector((state) => state.twenty.productData);
@@ -18,6 +19,13 @@ const Cart = () => {
     });
     setTotalAmt(preço.toFixed(2));
   }, [productData]);
+
+  const payment = async (token) => {
+    await axios.post("http:localhost:8000/pay", {
+      amount: totalAmt * 100,
+      token: token,
+    });
+  };
 
   const handleCheckOut = () => {
     if (userInfo) {
@@ -58,19 +66,19 @@ const Cart = () => {
           >
             Checkout
           </button>
-          {payNow && (
+          {payNow && 
             <div className="w-full mt-6 flex items-center justify-center">
               <StripeCheckOut
                 stripeKey="pk_test_51NIW5TC03jxtB1wtl9HFVNtqK2GRLqaFaFjrY4MtezKSmtzYVbPPNV3XN5JpBCLv5R82cI9ztZ1l9BSWvDsV4StC00SzlFujdl"
                 name="Twenty Fourty"
                 amount={totalAmt * 100}
                 label={`Your payment is €${totalAmt}`}
-                // token={payment}
+                token={payment}
                 email={userInfo.email}
                 description=""
               />
             </div>
-          )}
+          }
         </div>
         <ToastContainer
           position="top-left"
